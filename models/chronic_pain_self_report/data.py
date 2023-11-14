@@ -1,3 +1,12 @@
+import pandas as pd
+import random
+from dataclasses import dataclass
+import torch
+from torch.utils.data import Dataset, DataLoader
+from transformers import RobertaTokenizer
+from itertools import chain
+import glob
+
 @dataclass
 class FrameParams:
     df: pd.DataFrame
@@ -218,6 +227,13 @@ def load_data_to_loader_dict(base_file_path, test_size: float = 0.2,
     print(f'\ntrain distribution:\n{train_df.label.value_counts(dropna=False, normalize=True)}')
     print(f'\nval distribution:\n{val_df.label.value_counts(dropna=False, normalize=True)}')
     print(f'\ntest distribution:\n{test_df.label.value_counts(dropna=False, normalize=True)}')
+
+    # load roberta base as a tokenizer
+    tokenizer = RobertaTokenizer.from_pretrained(
+        'roberta-base', 
+        truncation=True, 
+        do_lower_case=True
+    )
 
     # load dataframes into dataset objects
     train_ds = TweetDataset(train_df, tokenizer, max_len)

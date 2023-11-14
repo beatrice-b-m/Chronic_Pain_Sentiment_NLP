@@ -1,4 +1,12 @@
-def train_model(model, loader_dict, metric_collection, 
+import os
+import pandas as pd
+import numpy as np
+import torch
+from tqdm import tqdm
+from pathlib import Path
+
+
+def train_model(model, device, loader_dict, metric_collection, 
                 criterion, optimizer, save_dir: str or None = None, 
                 num_epochs: int = 25, monitor_metric: str = 'val_loss'):
     if save_dir is not None:
@@ -97,7 +105,7 @@ def train_model(model, loader_dict, metric_collection,
     test_metrics_dict = evaluate_model(model, loader_dict['test'], metric_collection, criterion)
     return test_metrics_dict
 
-def evaluate_model(model, test_loader, metric_collection, criterion):
+def evaluate_model(model, device, test_loader, metric_collection, criterion):
     running_loss = 0.0
     
     tweet_id_list = []

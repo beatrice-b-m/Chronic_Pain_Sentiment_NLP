@@ -1,3 +1,6 @@
+import torch
+from transformers import RobertaModel
+
 class CustomRoberta(torch.nn.Module):
     """
     model subclass to define the RoBERTa architecture, also closely based on

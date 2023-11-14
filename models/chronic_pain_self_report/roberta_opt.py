@@ -1,9 +1,18 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "7"
 
+import torch
+from tuning import HyperParamOptimizer
+
+
+monitor_metric = "loss"
+epochs_per_run = 30
+SEED = 13
+n_random = 1
+n_guided = 2
+opt_idx = 'test'
 
 # seed torch operations
-SEED = 13
 torch.manual_seed(SEED)
 
 # define hyperparameter ranges to search
@@ -33,9 +42,6 @@ hparam_optimizer = HyperParamOptimizer(
 hparam_optimizer.load_data("/opt/localdata/Data/bea/nlp/bmi550/project/chronic_pain_model_data/*.csv")
 
 # start the optimization loop
-n_random = 1
-n_guided = 2
-opt_idx = 'test'
 hparam_optimizer.optimize(
     n_random=n_random, 
     n_guided=n_guided, 

@@ -1,14 +1,15 @@
 import numpy as np
 import pandas as pd
 from bayes_opt import BayesianOptimization
-from bayes_opt.logger import JSONLogger
-from bayes_opt.event import Events
 import json
 import logging
-import random
+import torch
 from data import load_data_to_loader_dict
-from training import train_model, evaluate_model
+from training import train_model
 from model import CustomRoberta
+from torchmetrics import MetricCollection
+from torchmetrics.classification import Accuracy, AUROC, F1Score, Precision, Recall
+from dataclasses import dataclass
 # from model.base import *
 
 class HyperParamOptimizer:
@@ -20,6 +21,7 @@ class HyperParamOptimizer:
         self.val_monitor_metric = f"val_{monitor_metric}"
         self.test_monitor_metric = f"test_{monitor_metric}"
         self.epochs_per_run = epochs_per_run
+        self.device = device
         
         # initialize parameters
         self.loader_dict = None
@@ -54,18 +56,15 @@ class HyperParamOptimizer:
         # open the log file
         opt_df = pd.read_json(log_path, lines=True)
         
-        # extract the best performing parameters based on the micro-avg f1
+        # extract the best performing parameters based on the monitor metric
         best_idx = opt_df[self.test_monitor_metric].idxmax()
         best_param_dict = opt_df.loc[best_idx, 'params']
         
         # train a model and evaluate it on the test set with the best performing parameters
-        print('Run using best params: ', best_param_dict)
-        # eval_obj = self.train_model(self.train_val_df, self.test_df, best_param_dict, verbose=False)
-        
+        print('Run using best params: ', best_param_dict)        
         metrics_dict = self.objective_function(**best_param_dict)
         
-        # micro and macro average f1 are the same since we only have 1 test set/train set
-        # log_data(best_param_dict, eval_obj.acc, eval_obj.f1, eval_obj.f1, final=True)
+        log_data(best_param_dict, metrics_dict, final=True)
         
     def objective_wrapper(self, **kwargs):
         """
@@ -78,7 +77,7 @@ class HyperParamOptimizer:
         eval_metric = test_metric_dict[self.test_monitor_metric]
         
         # log hyperparameter combination and eval metric (and if it's the final run)
-        log_data(kwargs, eval_metric, final: bool = False)
+        log_data(kwargs, eval_metric)
         return eval_metric
         
     def objective_function(self, dropout_proportion, learning_rate):
@@ -108,7 +107,8 @@ class HyperParamOptimizer:
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
                 
         eval_metric_dict = train_model(
-            model, 
+            model,
+            self.device,
             self.loader_dict, 
             metric_collection, 
             criterion, 
@@ -122,8 +122,8 @@ class HyperParamOptimizer:
 
 def log_data(param_dict, metric_dict, final: bool = False):
     # build the output dict
-    log_dict = {"final": final}
-    log_dict.update(param_dict)
+    log_dict = {"final": final, "params": param_dict}
+    # log_dict.update(param_dict)
     log_dict.update(metric_dict)
     
     # convert the dict to a json string
@@ -133,6 +133,7 @@ def log_data(param_dict, metric_dict, final: bool = False):
     logging.info(json_str)
     print("Results logged...")
     
+
 @dataclass
 class Evaluation:
     acc: float
