@@ -102,7 +102,7 @@ def train_model(model, device, loader_dict, metric_collection,
 
     # load best model weights and evaluate on test set
     model.load_state_dict(torch.load(model_save_path))
-    test_metrics_dict = evaluate_model(model, loader_dict['test'], metric_collection, criterion)
+    test_metrics_dict = evaluate_model(model, device, loader_dict['test'], metric_collection, criterion)
     return test_metrics_dict
 
 def evaluate_model(model, device, test_loader, metric_collection, criterion):

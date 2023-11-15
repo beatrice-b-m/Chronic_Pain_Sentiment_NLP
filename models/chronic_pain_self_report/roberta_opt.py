@@ -8,16 +8,16 @@ from tuning import HyperParamOptimizer
 monitor_metric = "loss"
 epochs_per_run = 30
 SEED = 13
-n_random = 1
-n_guided = 2
-opt_idx = 'test'
+n_random = 15
+n_guided = 45
+opt_idx = '2'
 
 # seed torch operations
 torch.manual_seed(SEED)
 
 # define hyperparameter ranges to search
 hparam_range_dict = {
-    'dropout_proportion': (0.001, 0.999), 'learning_rate': (0.00000001, 0.001)
+    'dropout_proportion': (0.1, 0.9), 'learning_rate': (0.0000001, 0.0001)
 }
 
 # get cpu, gpu or mps device for training.

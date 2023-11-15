@@ -186,13 +186,13 @@ def get_dataloader(dataset, batch_size, shuffle: bool = True,
     return dataloader
 
 
-# define constants
-TEST_SIZE = 0.2
-VALIDATION = True
-SEED = 13
-MAX_LEN = 256
-BATCH_SIZE = 128
-BASE_FILE_PATH = "/opt/localdata/Data/bea/nlp/bmi550/project/chronic_pain_model_data/*.csv"
+# # define constants
+# TEST_SIZE = 0.2
+# VALIDATION = True
+# SEED = 13
+# MAX_LEN = 256
+# BATCH_SIZE = 128
+# BASE_FILE_PATH = "/opt/localdata/Data/bea/nlp/bmi550/project/chronic_pain_model_data/*.csv"
 
 def load_data_to_loader_dict(base_file_path, test_size: float = 0.2, 
                              validation: bool = True, seed: int = 13, 

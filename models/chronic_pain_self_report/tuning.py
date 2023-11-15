@@ -10,7 +10,6 @@ from model import CustomRoberta
 from torchmetrics import MetricCollection
 from torchmetrics.classification import Accuracy, AUROC, F1Score, Precision, Recall
 from dataclasses import dataclass
-# from model.base import *
 
 class HyperParamOptimizer:
     def __init__(self, device, hparam_range_dict: dict, 
@@ -25,34 +24,30 @@ class HyperParamOptimizer:
         
         # initialize parameters
         self.loader_dict = None
-        self.target_feature = None
-        self.seed = None
         
     def load_data(self, base_file_path):
         self.loader_dict = load_data_to_loader_dict(base_file_path=base_file_path)
         print("Data loaded...")
                 
     def optimize(self, n_random, n_guided, opt_idx: str = '0'):
-        # convert categorical hparams to continuous ranges
-        hparam_dict = self.process_hparams()
-        
         log_path = f"./logs/roberta_opt_{opt_idx}.json"
         
         # start the logger
         logging.basicConfig(filename=log_path, level=logging.INFO, format='%(message)s')
         
-        print(f"\nOptimizing {self.model_name} {'-'*60}")
+        print(f"\nOptimizing RoBERTa {'-'*60}")
         print(f"Logging results to '{log_path}'")
 
         # define optimizer
         optimizer = BayesianOptimization(
             f=self.objective_wrapper,
-            pbounds=hparam_dict,
-            random_state=self.seed)
+            pbounds=self.hparam_range_dict,
+            random_state=self.seed
+        )
 
         # maximize f1 with hyperparams
         optimizer.maximize(init_points=n_random, n_iter=n_guided)
-
+            
         # open the log file
         opt_df = pd.read_json(log_path, lines=True)
         
@@ -76,8 +71,12 @@ class HyperParamOptimizer:
         test_metric_dict = self.objective_function(**kwargs)
         eval_metric = test_metric_dict[self.test_monitor_metric]
         
+        # if using loss, multiply by -1 so we can maximize it
+        if self.test_monitor_metric.split('_')[-1] == "loss":
+            eval_metric *= -1
+        
         # log hyperparameter combination and eval metric (and if it's the final run)
-        log_data(kwargs, eval_metric)
+        log_data(kwargs, test_metric_dict)
         return eval_metric
         
     def objective_function(self, dropout_proportion, learning_rate):
@@ -132,11 +131,3 @@ def log_data(param_dict, metric_dict, final: bool = False):
     # log the json string
     logging.info(json_str)
     print("Results logged...")
-    
-
-@dataclass
-class Evaluation:
-    acc: float
-    prec: float
-    rec: float
-    f1: float
