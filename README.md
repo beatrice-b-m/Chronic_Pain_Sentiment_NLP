@@ -4,7 +4,7 @@
 
 - **Chronic Pain Classifier**: This component includes the code for our classifier that identifies self-reported instances of chronic pain in social media posts.
   
-- **Sentiment Annotation Script**: This script was used to annotate the sentiment of the collected data, preparing it for sentiment analysis.
+- **Sentiment Annotation**: This script was used to annotate the sentiment of the self-reported chronic pain cohort, preparing it for sentiment analysis.
   
 - **General and Provider Sentiment Classifier**: This classifier is developed to identify the sentiment of the annotated data, focusing on the patient-provider interaction context.
 
