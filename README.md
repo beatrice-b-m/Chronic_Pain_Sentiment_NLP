@@ -1,7 +1,5 @@
 # Chronic Pain Sentiment Analysis Project
 
-## Repository Contents
-
 ### 1. Code and Models
 
 - **Chronic Pain Classifier**: This component includes the code for our classifier that identifies self-reported instances of chronic pain in social media posts.
