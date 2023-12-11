@@ -16,7 +16,3 @@ A detailed introduction to the background of our study, outlining the initial pl
 
 This is a progress report submitted for our initial findings and developments related to the self-reported chronic pain classifier. It includes insights gained and challenges encountered during the early stages of the project.
 
-### 4. Final Report 
-
-Our comprehensive final report detailing the findings, methodologies, and implications of our study. This report encapsulates the entirety of the research process and its outcomes.
-
